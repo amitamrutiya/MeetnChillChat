@@ -33,7 +33,7 @@ func Run() error {
 	fmt.Println("Cert", *cert)
 	fmt.Println("Key", *key)
 
-	engine := html.New("../views", ".html")
+	engine := html.New("./views", ".html")
 	app := fiber.New(fiber.Config{Views: engine})
 	app.Use(logger.New())
 	app.Use(cors.New())
