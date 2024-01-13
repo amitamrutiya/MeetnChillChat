@@ -1,16 +1,11 @@
 @import "fonts.css";
-*{
-  font-family: 'Montserrat', sans-serif;
-  background-color: aqua;
-}
 
 html {
   height: 100%;
 }
 
 .title {
-  font-size: large;
-  color: #f14668;
+  font-size: xx-large;
 }
 
 .container {
@@ -19,23 +14,18 @@ html {
 
 hr {
   height: 1px;
-  background-color: #f5e79d;
+  background-color: #F5E79D;
   border: none;
 }
 
 body {
-  background-color: whitesmoke;
+  background-color: #F5E79D;
   min-height: 100%;
   font-size: large;
 }
 
-.button {
-  background-color: #f14668;
-  color: #f5e79d;
-}
-
 footer {
-  color: #f5e79d;
+  color: #F5E79D;
   font-size: medium;
 }
 
@@ -60,7 +50,7 @@ video {
   border-radius: 1%;
   max-height: 50vh;
   margin: 10px;
-  background-color: #f5e79d;
+  background-color: #F5E79D;
   box-shadow: 5px 5px #4d27a3;
 }
 
@@ -79,7 +69,7 @@ video {
 }
 
 .chat {
-  box-shadow: 5px 5px #f5e79d;
+  box-shadow: 5px 5px #F5E79D;
   z-index: 99;
   position: fixed;
   bottom: 20px;
@@ -224,9 +214,4 @@ video {
   .chat {
     width: 23%;
   }
-}
-
-.room-link {
-  color: #f5e79d;
-  font-size: medium;
 }

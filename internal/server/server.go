@@ -26,14 +26,14 @@ func Run() error {
 	flag.Parse()
 
 	if *addr == ":" {
-		*addr = ":8080"
+		*addr = ":8077"
 	}
 
 	fmt.Println("addr", *addr)
 	fmt.Println("Cert", *cert)
 	fmt.Println("Key", *key)
 
-	engine := html.New("./views", ".html")
+	engine := html.New("../views", ".html")
 	app := fiber.New(fiber.Config{Views: engine})
 	app.Use(logger.New())
 	app.Use(cors.New())
