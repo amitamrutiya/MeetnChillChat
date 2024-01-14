@@ -33,7 +33,7 @@ var (
 
 				Username: "amit",
 
-				Credential:     "amrutiya",
+				Credential:     "sharma",
 				CredentialType: webrtc.ICECredentialTypePassword,
 			},
 		},

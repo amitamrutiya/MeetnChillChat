@@ -189,7 +189,6 @@ navigator.mediaDevices
   })
   .then((stream) => {
     document.getElementById("localVideo").srcObject = stream;
-    console.log("got stream" + stream);
     connect(stream);
   })
   .catch((err) => console.log(err));

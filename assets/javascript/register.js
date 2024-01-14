@@ -1,4 +1,4 @@
-var isSafari = window.isSafari !== undefined
+var isSafari = window.safari !== undefined
 
 if ('serviceWorker' in navigator) {
   if (isSafari) { // if it's safari, disable current service workers and don't start a service worker.
