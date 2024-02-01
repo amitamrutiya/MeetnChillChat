@@ -1,4 +1,4 @@
-# [MeetnChillChat 🔗](https://meetnchill.onrender.com/)
+# MeetnChillChat 🔗
 
 MeetnChillChat is a video calling, chatting, and streaming application with a backend written in Go and a user interface built using HTML, CSS, and JavaScript.
 
