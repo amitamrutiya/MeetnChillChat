@@ -10,18 +10,23 @@ import (
 	"github.com/pion/webrtc/v3"
 )
 
+// StreamConn establishes a new WebRTC connection for streaming
 func StreamConn(c *websocket.Conn, p *Peers) {
+	// Determine WebRTC configuration based on environment
 	var config webrtc.Configuration
 	if os.Getenv("ENVIRONMENT") == "PRODUCTION" {
-		config = turnConfig
+		config = turnConfig // Use TURN server in production
 	}
+
+	// Create a new peer connection
 	peerConnection, err := webrtc.NewPeerConnection(config)
 	if err != nil {
 		log.Print(err)
 		return
 	}
-	defer peerConnection.Close()
+	defer peerConnection.Close() // Close the peer connection when the function exits
 
+	// Add transceivers for video and audio
 	for _, typ := range []webrtc.RTPCodecType{webrtc.RTPCodecTypeVideo, webrtc.RTPCodecTypeAudio} {
 		if _, err := peerConnection.AddTransceiverFromKind(typ, webrtc.RTPTransceiverInit{
 			Direction: webrtc.RTPTransceiverDirectionRecvonly,
@@ -31,19 +36,23 @@ func StreamConn(c *websocket.Conn, p *Peers) {
 		}
 	}
 
+	// Create a new PeerConnectionState
 	newPeer := PeerConnectionState{
 		PeerConnection: peerConnection,
 		Websocket: &ThreadSafeWriter{
 			Conn:  c,
 			Mutex: sync.Mutex{},
-		}}
+		},
+	}
 
+	// Add the new PeerConnection to the global list
 	p.ListLock.Lock()
 	p.Connections = append(p.Connections, newPeer)
 	p.ListLock.Unlock()
 
 	log.Println(p.Connections)
 
+	// Handle ICE candidate messages from the client
 	peerConnection.OnICECandidate(func(i *webrtc.ICECandidate) {
 		if i == nil {
 			return
@@ -63,6 +72,7 @@ func StreamConn(c *websocket.Conn, p *Peers) {
 		}
 	})
 
+	// Handle changes in connection state
 	peerConnection.OnConnectionStateChange(func(pp webrtc.PeerConnectionState) {
 		switch pp {
 		case webrtc.PeerConnectionStateFailed:
@@ -70,13 +80,15 @@ func StreamConn(c *websocket.Conn, p *Peers) {
 				log.Print(err)
 			}
 		case webrtc.PeerConnectionStateClosed:
-			p.SignalPeerConnections()
+			p.SignalPeerConnections() // Signal peer connections when closed
 		}
 	})
 
-	p.SignalPeerConnections()
+	p.SignalPeerConnections() // Signal peer connections upon successful setup
+
 	message := &websocketMessage{}
 	for {
+		// Read and handle messages from the client
 		_, raw, err := c.ReadMessage()
 		if err != nil {
 			log.Println(err)
@@ -88,6 +100,7 @@ func StreamConn(c *websocket.Conn, p *Peers) {
 
 		switch message.Event {
 		case "candidate":
+			// Handle ICE candidate message
 			candidate := webrtc.ICECandidateInit{}
 			if err := json.Unmarshal([]byte(message.Data), &candidate); err != nil {
 				log.Println(err)
@@ -99,6 +112,7 @@ func StreamConn(c *websocket.Conn, p *Peers) {
 				return
 			}
 		case "answer":
+			// Handle SDP answer message
 			answer := webrtc.SessionDescription{}
 			if err := json.Unmarshal([]byte(message.Data), &answer); err != nil {
 				log.Println(err)
