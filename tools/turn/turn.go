@@ -14,30 +14,34 @@ import (
 )
 
 func main() {
-	publicIP := flag.String("public-ip", "", "")
-	port := flag.Int("port", 3478, "")
-	users := flag.String("users", "", "") // user=pass,user=pass
-	realm := flag.String("realm", "v.amit.sh", "")
+	// Command-line flags
+	publicIP := flag.String("public-ip", "", "Public IP address of the TURN server")
+	port := flag.Int("port", 3478, "Port number for the TURN server")
+	users := flag.String("users", "", "List of users and passwords in the format 'user=password,user=password'")
+	realm := flag.String("realm", "v.amit.sh", "Realm for the TURN server")
 	flag.Parse()
 
+	// Validate command-line flags
 	if len(*publicIP) == 0 {
 		log.Fatalf("public-ip is required")
 	}
-
 	if len(*users) == 0 {
 		log.Fatalf("'users' is required")
 	}
 
+	// Create a UDP listener for TURN server
 	udpListener, err := net.ListenPacket("udp4", "0.0.0.0:"+strconv.Itoa(*port))
 	if err != nil {
 		log.Panicf("failed to create TURN server listener: %s", err)
 	}
 
+	// Parse user credentials and generate authentication keys
 	usersMap := map[string][]byte{}
 	for _, kv := range regexp.MustCompile(`(\w+)=(\w+)`).FindAllStringSubmatch(*users, -1) {
 		usersMap[kv[1]] = turn.GenerateAuthKey(kv[1], *realm, kv[2])
 	}
 
+	// Configure and start the TURN server
 	s, err := turn.NewServer(turn.ServerConfig{
 		Realm: *realm,
 		AuthHandler: func(username string, realm string, srcAddr net.Addr) ([]byte, bool) {
@@ -46,7 +50,6 @@ func main() {
 			}
 			return nil, false
 		},
-
 		PacketConnConfigs: []turn.PacketConnConfig{
 			{
 				PacketConn: udpListener,
@@ -63,10 +66,12 @@ func main() {
 		log.Panic(err)
 	}
 
+	// Wait for termination signals
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	<-sigs
 
+	// Close the TURN server
 	if err = s.Close(); err != nil {
 		log.Panic(err)
 	}
