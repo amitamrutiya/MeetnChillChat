@@ -21,6 +21,7 @@ var (
 	key  = flag.String("key", "", "")
 )
 
+// Run starts the server
 func Run() error {
 	flag.Parse()
 
@@ -33,6 +34,7 @@ func Run() error {
 	app.Use(logger.New())
 	app.Use(cors.New())
 
+	// Routes
 	app.Get("/", handlers.Welcome)
 	app.Get("/room/create", handlers.RoomCreate)
 	app.Get("/room/:uuid", handlers.Room)
@@ -42,23 +44,31 @@ func Run() error {
 	app.Get("/room/:uuid/chat", handlers.RoomChat)
 	app.Get("/room/:uuid/chat/websocket", websocket.New(handlers.RoomChatWebsocket))
 	app.Get("/room/:uuid/viewer/websocket", websocket.New(handlers.RoomViewerWebsocket))
+
 	app.Get("/stream/:suuid", handlers.Stream)
 	app.Get("/stream/:suuid/websocket", websocket.New(handlers.StreamWebsocket, websocket.Config{
 		HandshakeTimeout: 10 * time.Second,
 	}))
 	app.Get("/stream/:suuid/chat/websocket", websocket.New(handlers.StreamChatWebsocket))
 	app.Get("/stream/:suuid/viewer/websocket", websocket.New(handlers.StreamViewerWebsocket))
+
 	app.Static("/", "./assets")
 
+	// Initialize rooms and streams maps
 	w.Rooms = make(map[string]*w.Room)
 	w.Streams = make(map[string]*w.Room)
+
+	// Start periodic key frame dispatching
 	go dispatchKeyFrames()
+
+	// Listen to the specified address
 	if *cert != "" {
 		return app.ListenTLS(*addr, *cert, *key)
 	}
 	return app.Listen(*addr)
 }
 
+// dispatchKeyFrames periodically dispatches key frames to all peers in all rooms
 func dispatchKeyFrames() {
 	for range time.NewTicker(time.Second * 3).C {
 		for _, room := range w.Rooms {
