@@ -1,4 +1,3 @@
-@import "bulma/css/bulma.min.css";
 @import "fonts.css";
 
 html {
@@ -15,18 +14,18 @@ html {
 
 hr {
   height: 1px;
-  background-color: #F5E79D;
+  background-color: #f5e79d;
   border: none;
 }
 
 body {
-  background-color: #F5E79D;
+  background-color: #f5e79d;
   min-height: 100%;
   font-size: large;
 }
 
 footer {
-  color: #F5E79D;
+  color: #f5e79d;
   font-size: medium;
 }
 
@@ -51,7 +50,7 @@ video {
   border-radius: 1%;
   max-height: 50vh;
   margin: 10px;
-  background-color: #F5E79D;
+  background-color: #f5e79d;
   box-shadow: 5px 5px #4d27a3;
 }
 
@@ -70,7 +69,7 @@ video {
 }
 
 .chat {
-  box-shadow: 5px 5px #F5E79D;
+  box-shadow: 5px 5px #f5e79d;
   z-index: 99;
   position: fixed;
   bottom: 20px;
